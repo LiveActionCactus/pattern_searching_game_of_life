@@ -17,8 +17,8 @@ def place_agents_random(data, num_agents):
 ###
 
 if __name__ == "__main__":
-	rows = 10
-	cols = 10
+	rows = 5
+	cols = 5
 
 	# Build map and padded map
 	game_board = Board(rows, cols) 
@@ -27,8 +27,6 @@ if __name__ == "__main__":
 
 	# Calculate neighbors
 	game = GameOfLife(game_board)
-	neighbors = game.find_neighbors()
-
-	print(neighbors)
+	game.run_game_one_step()
 
 	game_board.plot_board()
