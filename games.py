@@ -2,19 +2,33 @@ import numpy as np
 # needs a map input, outputs updated map(s?)
 
 class GameOfLife:
-	def __init__(self, game_board, birth=3, survive=(2,3)):
+	def __init__(self, game_board, sim_steps=25, birth=3, survive=(2,3)):
 		self.game_board = game_board
 		self.birth = birth
 		self.survive = survive
+		self.sim_steps = sim_steps
 
 
 	def run_game_one_step(self):
-		neighbors = self.find_neighbors(neighborhood='moore')
-		birth_survive_board = np.ma.masked_inside(neighbors, self.survive[0], self.birth) # TODO: generalize this for arbitrary birth/survive values
-		print(neighbors)
-		print(birth_survive_board.mask)
-		input()
+		# survive means value already exists (1/True) and it remains existing; need to check this precondition
+			# survive must be an AND operation
+		# birth means value does not exist (0/False) and it starts existing (1/True); need to check this precondition
+			# birth must be an AND operation with NOT original board
 		
+		neighbors = self.find_neighbors(neighborhood='moore')
+		board_mask = np.ma.make_mask(self.game_board.board)
+		
+		survive_temp = np.ma.masked_inside(neighbors, self.survive[0], self.survive[1])
+		survive_board = np.ma.logical_and(board_mask, survive_temp.mask)
+		
+		birth_temp = np.ma.masked_equal(neighbors, self.birth)
+		birth_board = np.ma.logical_and(np.logical_not(board_mask), birth_temp.mask)
+
+		new_board = np.ma.logical_or(survive_board, birth_board)
+
+		self.game_board.board = np.ma.logical_or(survive_board, birth_board).astype(int)
+		self.game_board.state_log.append(self.game_board.board)
+
 
 	def find_neighbors(self, neighborhood='moore'):
 		if neighborhood == 'moore':
@@ -46,6 +60,6 @@ class GameOfLife:
 	###
 
 	def pad_game_board(self, game_board, pad=1):
-		padded_game_board = np.pad(self.game_board.map, pad_width=pad, mode='constant')
+		padded_game_board = np.pad(self.game_board.board, pad_width=pad, mode='constant')
 
 		return padded_game_board

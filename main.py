@@ -1,32 +1,26 @@
-import numpy as np
-import random
 from board import Board
 from games import GameOfLife
 
-
-
-
-def place_agents_random(data, num_agents):
-	for i in range(0,num_agents):
-		data[random.randint(0, rows - 1), random.randint(0, cols - 1)] = 1
-
-	return(data)
-
-###
-# Begin main
-###
 
 if __name__ == "__main__":
 	rows = 5
 	cols = 5
 
-	# Build map and padded map
-	game_board = Board(rows, cols) 
-	game_board.map = place_agents_random(game_board.board, 20)
+	# Initialize game board
+	game_board = Board(rows, cols)
 
+	# Choose initial state 
+	#game_board.init_agents_random(num_agents=10)			# TODO: doesn't guarantee 10 unique agents, could be collisions
+	# game_board.init_blinker()
+	# game_board.init_boat()
+	game_board.init_clock()
 
-	# Calculate neighbors
-	game = GameOfLife(game_board)
-	game.run_game_one_step()
+	# Initialize game to play on the board
+	game = GameOfLife(game_board, sim_steps=10)
 
+	# Run game
+	for i in range(0, game.sim_steps):
+		game.run_game_one_step()
+
+	# Plot results
 	game_board.plot_board()
