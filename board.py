@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 import time
 
+# TODO: implement user def'd board
+
 class Board:
 	def __init__(self, rows=10, cols=10):
 		self.rows = rows
@@ -46,7 +48,7 @@ class Board:
 		self.board[r-1,c+2]		= 1
 
 
-	def plot_board(self, delay=0.5):
+	def plot_board(self, blocking=False, delay=0.5):
 		# Create discrete colormap
 		cmap = colors.ListedColormap(['white', 'black'])
 		norm = colors.BoundaryNorm([0, 1], cmap.N)
@@ -71,4 +73,7 @@ class Board:
 			fig.canvas.flush_events()
 			time.sleep(delay)
 
-		plt.show(block=True)
+			if np.sum(state) == 0:
+				break
+
+		plt.show(block=blocking)
